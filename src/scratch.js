@@ -1,7 +1,9 @@
 
+l(parseExpr('(1)')[0]);
+
 l(cmpl(["'", ['+']]));
 
-cdbg("(' (+))");
+//cdbg("(' (+))");
 
 cdbg("(imp 1 2 3)");
 
@@ -22,7 +24,11 @@ l(run('(imp (for ((let i 0) (< i 10) (+= i 2)) (l i)))'));
 
 cdbg('(for ((let i 0) (< i 10) (++ i)) (l i) (l (* i 2)))');
 
-l(run('(+ 1 2)'));
+l(run('(+ 1 2 3)'));
+
+cdbg('(+ 1 2 1)'); //TODO why?
+
+//cdbg('(+ 1 2 1 )'); //TODO fix parsing
 
 l(run("(' (1 2 3))"));
 

@@ -107,9 +107,11 @@ alops = [
   '<', '>', '<=', '>=',
 ].map(op => {
   cmacros.set(op, (qb, ...args) => {
-    [first, ...rest] = args.map(x => yeet(qb, x));
-    if (first === undefined) return 0;
-    return '(' + first + rest.map(x => ' '+ op +' ' + x) + ')';
+    let eargs = args.map(x => yeet(qb, x));
+    //if (first === undefined) return 0; //TODO for mul it's wrong!
+    //remove?
+    //return '(' + first + rest.map(x => ' '+ op +' ' + x).join('') + ')';
+    return '(' + eargs.join(' '+op+' ') + ')';
   }); //^^ TODO use `${...}`?
 });
 
@@ -189,7 +191,6 @@ parseExpr = str => {
   // keys
 }
 
-l(parseExpr('(1)')[0]);
 
 
 cdbg = code => {
