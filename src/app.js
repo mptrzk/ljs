@@ -2,8 +2,6 @@ document.body.innerHTML = '<h1>Hello, World!</h1>';
 
 l = console.log
 
-f = (a, b) => a + b;
-
 cmacros = new Map();
 
 
@@ -95,15 +93,19 @@ cmacros.set('`', (qb, arg) => {
   });
 });
 
-[
+alops = [
   '+', '-', '*', '/', '%',
   '&', '|', '^',
   '&&', '||', '??',
+];
+
+[
+  ...alops,
+  ...alops.map(x => x + '='),
   '=', '==', '===',
   '!=', '!==',
   '<', '>', '<=', '>=',
-]
-.map(op => {
+].map(op => {
   cmacros.set(op, (qb, ...args) => {
     [first, ...rest] = args.map(x => yeet(qb, x));
     if (first === undefined) return 0;
@@ -116,7 +118,7 @@ cmacros.set('++', (qb, arg) => {
 });
 
 
-toStatements = (arr) => arr.map(x => x+';\n').join('');
+toStatements = (arr) => arr.map(x => x+';').join('\n');
 
 cmacros.set('imp', (qb, ...args) => {
   return `(() => {
@@ -124,14 +126,6 @@ cmacros.set('imp', (qb, ...args) => {
   })()`;
 });
 
-cmacros.set('for2', (qb, ...args) => {
-  let [clause, ...body] = args;
-  let [vname, ival, condt, incr] = clause.map(x => yeet(qb, x));
-  body = body.map(x => yeet(qb, x));
-  return `for (let ${vname}=${ival}; ${condt}; ${incr}) {
-    ${toStatements(body)}
-  }`
-});
 
 cmacros.set('for', (qb, ...args) => {
   let [clause, ...body] = args;
@@ -201,7 +195,7 @@ l(parseExpr('(1)')[0]);
 cdbg = code => {
   let qb = [];
   let c = yeet(qb, parseExpr(code)[0]);
-  console.log(qb, c);
+  console.log(c);
 }
 
 run = x => cmpl(parseExpr(x)[0]);

@@ -18,9 +18,9 @@ cdbg("((, 1) (,@ (1 2 3)) (, 4))");
 
 l(parseExpr('("1 2 " (+ 3 5) 3)'));
 
-l(run('(imp (for ((let i 0) (< i 10) (++ i)) (l i)))'));
+l(run('(imp (for ((let i 0) (< i 10) (+= i 2)) (l i)))'));
 
-cdbg('(for ((let i 0) (< i 10) (++ i)) (l i))');
+cdbg('(for ((let i 0) (< i 10) (++ i)) (l i) (l (* i 2)))');
 
 l(run('(+ 1 2)'));
 
