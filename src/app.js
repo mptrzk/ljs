@@ -22,9 +22,8 @@ cmpl = code => {
   let qb = [];
   let c = yeet(qb, code);
   return (() => {}).constructor('__quotes', `return ${c};`)(qb);
-  l(qb);
-  l(c);
 }
+
 
 cmacros.set("'", (qb, arg) => {
   let qi = qb.length;
@@ -42,9 +41,9 @@ cmacros.set("'", (qb, arg) => {
 });
 
 cmacros.set('imp', (qb, ...args) => {
-  return `() => {
+  return `(() => {
     ${args.map(x => yeet(qb, x)).map(x => x + ';\n').join('')}
-  }`;
+  })()`;
 });
 //^^ 
 
@@ -66,8 +65,6 @@ equal = (x, y) => {
 numericp = x => !isNaN(x);
 
 
-l(cmpl(["'", ['+']]));
-//^^ it should return undefined, as console.log does
 
 parseList = str => {
   //try {throw Error();} catch(e) {};
@@ -105,26 +102,13 @@ parseExpr = str => {
 l(parseExpr('(1)')[0]);
 
 
+cdbg = code => {
+  let qb = [];
+  let c = yeet(qb, parseExpr(code)[0]);
+  console.log(qb, c);
+}
+
 run = x => cmpl(parseExpr(x)[0]);
 
 
-l(parseExpr('("1 2 " (+ 3 5) 3)'));
-
-l(run('(+ 1 2)'));
-
-l(run("(' (1 2 3))")); //why strings?
-
-l(run("(cons 1 (list 1 2))"));
-
-l(run("(cons 1 (' (1 2 3)))"));
-
-l(run("(concat (' (1 2 3)) (' (4 5 6)))"));
-
-l(run("(concat (' (1 2 3)) (' (4 :x 5 :y 6)))"));
-
-l(run("(' (4 :x 5 :y 6))"));
-
-l(parseExpr("(:x 2 3 :y 3)"))
-
 wslime.load('src/tests.js');
-
