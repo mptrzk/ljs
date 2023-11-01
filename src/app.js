@@ -69,6 +69,33 @@ cmacros.set('`', (qb, arg) => {
 });
 
 [
+  'return',
+  'yield',
+  'throw',
+  'new',
+  'delete',
+  'await',
+  'async',
+].map(op => {
+  cmacros.set(op, (qb, arg) => {
+    return `${op} ${yeet(qb, arg)}`;
+  });
+});
+
+[
+  'const',
+  'let',
+  'var',
+].map(op => {
+  cmacros.set(op, (qb, ...args) => {
+    let ret = `${op} ${args[0]}`;
+    if (args.length == 2) ret += ` = ${yeet(qb, args[1])}`;
+    //TODO error handling
+    return ret;
+  });
+});
+
+[
   '+', '-', '*', '/', '%',
   '&', '|', '^',
   '&&', '||', '??',
@@ -81,7 +108,7 @@ cmacros.set('`', (qb, arg) => {
     [first, ...rest] = args.map(x => yeet(qb, x));
     if (first === undefined) return 0;
     return '(' + first + rest.map(x => ' '+ op +' ' + x) + ')';
-  }); 
+  }); //^^ TODO use `${...}`?
 });
 
 cmacros.set('++', (qb, arg) => {
@@ -97,11 +124,20 @@ cmacros.set('imp', (qb, ...args) => {
   })()`;
 });
 
-cmacros.set('for', (qb, ...args) => {
+cmacros.set('for2', (qb, ...args) => {
   let [clause, ...body] = args;
   let [vname, ival, condt, incr] = clause.map(x => yeet(qb, x));
   body = body.map(x => yeet(qb, x));
   return `for (let ${vname}=${ival}; ${condt}; ${incr}) {
+    ${toStatements(body)}
+  }`
+});
+
+cmacros.set('for', (qb, ...args) => {
+  let [clause, ...body] = args;
+  let [ival, condt, incr] = clause.map(x => yeet(qb, x));
+  body = body.map(x => yeet(qb, x));
+  return `for (${ival}; ${condt}; ${incr}) {
     ${toStatements(body)}
   }`
 });
