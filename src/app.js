@@ -68,7 +68,14 @@ cmacros.set('`', (qb, arg) => {
   return `qqsub(__quotes[${qi}], [${a.toString()}])`;
 });
 
-['+', '-', '*', '/', '%', '&', '|', '^', '&&', '||', '??']
+[
+  '+', '-', '*', '/', '%',
+  '&', '|', '^',
+  '&&', '||', '??',
+  '=', '==', '===',
+  '!=', '!==',
+  '<', '>', '<=', '>=',
+]
 .map(op => {
   cmacros.set(op, (qb, ...args) => {
     [first, ...rest] = args.map(x => yeet(qb, x));
@@ -77,8 +84,8 @@ cmacros.set('`', (qb, arg) => {
   }); 
 });
 
-cmacros.set('++', (qb, ...args) => {
-  return `${yeet(qb, arg[0])}++`;
+cmacros.set('++', (qb, arg) => {
+  return `${yeet(qb, arg)}++`;
 });
 
 
@@ -92,9 +99,10 @@ cmacros.set('imp', (qb, ...args) => {
 
 cmacros.set('for', (qb, ...args) => {
   let [clause, ...body] = args;
-  let [vname, ival, condt, incr] = clause;
+  let [vname, ival, condt, incr] = clause.map(x => yeet(qb, x));
+  body = body.map(x => yeet(qb, x));
   return `for (let ${vname}=${ival}; ${condt}; ${incr}) {
-    
+    ${toStatements(body)}
   }`
 });
 
