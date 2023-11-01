@@ -7,7 +7,13 @@ cdbg("(imp 1 2 3)");
 
 l(run("(imp (l 1) (return 2))"));
 
+l(qqsub(parseExpr("((, foo) (,@ bar) (, baz))")[0], [1, [2, 3], 4]));
 
+l(qqextract(parseExpr("((, foo) (,@ (1 2 3)) (, baz))")[0]));
+
+l(run("(` (1 (, (+ 1 1)) (,@ (list 3 4 5))))"));
+
+cdbg("((, 1) (,@ (1 2 3)) (, 4))");
 
 
 l(parseExpr('("1 2 " (+ 3 5) 3)'));

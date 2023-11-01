@@ -31,6 +31,43 @@ cmacros.set("'", (qb, arg) => {
   return `__quotes[${qi}]`;
 });
 
+
+qqextractRec = (expr, lst) => {
+  expr.map(el => {
+    if (!listp(el)) return;
+    if (el[0] == ',' || el[0] == ',@') {
+      lst.push(el[1]);
+      return;
+    }
+    qqextractRec(el, lst);
+  });
+}
+
+qqextract = expr => {
+  let lst = [];
+  qqextractRec(expr, lst);
+  return lst;
+}
+//^^ without rec, using concat or something?
+//sounds slower
+
+qqsub = (expr, subs) => {
+  return concat(...expr.map(el => {
+    if (!listp(el)) return [el];
+    if (el[0] == ',') return [subs.shift()];
+    if (el[0] == ',@') return subs.shift();
+    return [qqsub(el, subs)];
+  }));
+}
+
+cmacros.set('`', (qb, arg) => {
+  //let q = cmacros.get("'")(qb, arg);
+  let qi = qb.length;
+  qb.push(arg);
+  a = qqextract(arg).map(x => yeet(qb, x));
+  return `qqsub(__quotes[${qi}], [${a.toString()}])`;
+});
+
 ['+', '-', '*', '/', '%', '&', '|', '^', '&&', '||', '??']
 .map(op => {
   cmacros.set(op, (qb, ...args) => {
@@ -40,12 +77,26 @@ cmacros.set("'", (qb, arg) => {
   }); 
 });
 
+cmacros.set('++', (qb, ...args) => {
+  return `${yeet(qb, arg[0])}++`;
+});
+
+
+toStatements = (arr) => arr.map(x => x+';\n').join('');
+
 cmacros.set('imp', (qb, ...args) => {
   return `(() => {
-    ${args.map(x => yeet(qb, x)).map(x => x + ';\n').join('')}
+    ${toStatements(args.map(x => yeet(qb, x)))}
   })()`;
 });
-//^^ 
+
+cmacros.set('for', (qb, ...args) => {
+  let [clause, ...body] = args;
+  let [vname, ival, condt, incr] = clause;
+  return `for (let ${vname}=${ival}; ${condt}; ${incr}) {
+    
+  }`
+});
 
 car = x => x[0];
 cdr = x => x.slice(1);
@@ -63,6 +114,7 @@ equal = (x, y) => {
   return x === y;
 };
 numericp = x => !isNaN(x);
+listp = Array.isArray;
 
 
 
