@@ -4,6 +4,11 @@ l = console.log
 
 cmacros = new Map();
 
+Array.prototype.kmap = function (fn) {
+  ret = [];
+  Object.keys(this).forEach(k => ret[k] = fn(this[k]));
+  return ret;
+}
 
 yeet = (qb, code) => {
   if (Array.isArray(code)) {

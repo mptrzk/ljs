@@ -15,7 +15,8 @@ l(qqextract(parseExpr("((, foo) (,@ (1 2 3)) (, baz))")[0]));
 
 l(run("(` (0 (1 (, (+ 1 1)) (,@ (list 3 4 5)))))"));
 
-cdbg("((, 1) (,@ (1 2 3)) (, 4))");
+l(run("(` ((1 (, (+ 1 1)) (,@ (list 3 4 5))) :x 0))").x);//TODO fix
+//array.map doesn't work with keys, right?
 
 
 l(parseExpr('("1 2 " (+ 3 5) 3)'));
@@ -42,6 +43,6 @@ l(run("(concat (' (1 2 3)) (' (4 :x 5 :y 6)))"));
 
 l(run("(' (4 :x 5 :y 6))"));
 
-l(parseExpr("(:x 2 3 :y 3)"))
+l(parseExpr("(:x 2 3 :y 3)")[0].kmap(x => 2*x))
 
 
