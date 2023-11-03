@@ -9,13 +9,13 @@ cdbg("(imp 1 2 3)");
 
 l(run("(imp (l 1) (return 2))"));
 
-l(qqsub(parseExpr("((, foo) (,@ bar) (, baz))")[0], [1, [2, 3], 4]));
+l(qqsub(read("((, foo) (,@ bar) (, baz))"), [1, [2, 3], 4]));
 
-l(qqextract(parseExpr("((, foo) (,@ (1 2 3)) (, baz))")[0]));
+l(qqextract(read("((, foo) (,@ (1 2 3)) (, baz))")));
 
 l(run("(` (0 (1 (, (+ 1 1)) (,@ (list 3 4 5)))))"));
 
-l(run("(` ((1 (, (+ 1 1)) (,@ (list 3 4 5))) :x 0))").x);//TODO fix
+l(run("(` ((1 (, (+ 1 1)) (,@ (list 3 4 5))) :x 2))"));//TODO fix
 //array.map doesn't work with keys, right?
 
 
@@ -43,6 +43,5 @@ l(run("(concat (' (1 2 3)) (' (4 :x 5 :y 6)))"));
 
 l(run("(' (4 :x 5 :y 6))"));
 
-l(parseExpr("(:x 2 3 :y 3)")[0].kmap(x => 2*x))
-
+l(read("(:x 2 3 :y 3)").kmap(x => 2*x))
 
