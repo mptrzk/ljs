@@ -59,11 +59,11 @@ Array.prototype.kmap = function (fn) {
   return ret;
 }
 
-yeet = (qb, code) => {
+expand = (qb, code) => {
   if (isArray(code)) {
     let [op, ...args] = code;
     let m = cmacros.get(op);
-    let a = args.map(x => yeet(qb, x));
+    let a = args.map(x => expand(qb, x));
     if (m === undefined) return `${op}(${a.toString()})`;
     return m(qb, ...args);
   }
@@ -72,19 +72,20 @@ yeet = (qb, code) => {
 
 cmpl = code => {
   let qb = [];
-  let c = yeet(qb, code);
-  return (() => {}).constructor('__quotes', `return ${c};`)(qb);
+  let js = expand(qb, code); 
+  return (() => {}).constructor('__quotes', `return ${js};`)(qb);
 }
 
 cdbg = code => {
   let qb = [];
-  let c = yeet(qb, read(code));
+  let c = expand(qb, read(code));
   console.log(c);
 }
 
 run = x => cmpl(read(x));
 
 
-wslime.load('src/functions.js');
-wslime.load('src/cmacros.js');
-wslime.load('src/tests.js');
+await wslime.load('src/functions.js');
+await wslime.load('src/cmacros.js');
+await wslime.load('src/tests.js');
+//^^ TODO - can lack of await cause bugs here?

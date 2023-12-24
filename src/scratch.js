@@ -15,6 +15,10 @@ l(qqextract(read("((, foo) (,@ (1 2 3)) (, baz))")));
 
 l(run("(` (0 (1 (, (+ 1 1)) (,@ (list 3 4 5)))))"));
 
+l(run("(` 1)")); //TODO?
+
+l(run("(` (1 (, l) 3))"));
+
 l(run("(` ((1 (, (+ 1 1)) (,@ (list 3 4 5))) :x 2))"));//TODO fix
 //array.map doesn't work with keys, right?
 

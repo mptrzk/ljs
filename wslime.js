@@ -3,7 +3,7 @@
   top.wslime = {
     eval: async src => (async () => {}).constructor(src)(),
     after: () => {},
-    load: async url => wslime.eval(await (await fetch(url)).text()),
+    load: async url => wslime.eval(await (await fetch(url, {cache: 'no-store'})).text()),
   };
 
   const config = (await (await fetch('config.json')).json())

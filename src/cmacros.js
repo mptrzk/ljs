@@ -27,7 +27,7 @@ qqextract = expr => {
 qqsub = (expr, subs) => {
   return concat(...expr.map(el => {
     if (!isArray(el)) return [el];
-    if (el[0] == ',') return [subs.shift()];
+    if (el[0] == ',') return [subs.shift()]; //how about atoms?
     if (el[0] == ',@') return subs.shift();
     return [qqsub(el, subs)];
   }));
@@ -37,7 +37,7 @@ cmacros.set('`', (qb, arg) => {
   //let q = cmacros.get("'")(qb, arg);
   let qi = qb.length;
   qb.push(arg);
-  a = qqextract(arg).map(x => yeet(qb, x));
+  a = qqextract(arg).map(x => expand(qb, x));
   return `qqsub(__quotes[${qi}], [${a.toString()}])`;
 });
 
@@ -51,7 +51,7 @@ cmacros.set('`', (qb, arg) => {
   'async',
 ].map(op => {
   cmacros.set(op, (qb, arg) => {
-    return `${op} ${yeet(qb, arg)}`;
+    return `${op} ${expand(qb, arg)}`;
   });
 });
 
@@ -62,7 +62,7 @@ cmacros.set('`', (qb, arg) => {
 ].map(op => {
   cmacros.set(op, (qb, ...args) => {
     let ret = `${op} ${args[0]}`;
-    if (args.length == 2) ret += ` = ${yeet(qb, args[1])}`;
+    if (args.length == 2) ret += ` = ${expand(qb, args[1])}`;
     //TODO error handling
     return ret;
   });
@@ -82,7 +82,7 @@ alops = [
   '<', '>', '<=', '>=',
 ].map(op => {
   cmacros.set(op, (qb, ...args) => {
-    let eargs = args.map(x => yeet(qb, x));
+    let eargs = args.map(x => expand(qb, x));
     //if (first === undefined) return 0; //TODO for mul it's wrong!
     //remove?
     //return '(' + first + rest.map(x => ' '+ op +' ' + x).join('') + ')';
@@ -91,7 +91,7 @@ alops = [
 });
 
 cmacros.set('++', (qb, arg) => {
-  return `${yeet(qb, arg)}++`;
+  return `${expand(qb, arg)}++`;
 });
 
 
@@ -99,15 +99,15 @@ toStatements = (arr) => arr.map(x => x+';').join('\n');
 
 cmacros.set('imp', (qb, ...args) => {
   return `(() => {
-    ${toStatements(args.map(x => yeet(qb, x)))}
+    ${toStatements(args.map(x => expand(qb, x)))}
   })()`;
 });
 
 
 cmacros.set('for', (qb, ...args) => {
   let [clause, ...body] = args;
-  let [ival, condt, incr] = clause.map(x => yeet(qb, x));
-  body = body.map(x => yeet(qb, x));
+  let [ival, condt, incr] = clause.map(x => expand(qb, x));
+  body = body.map(x => expand(qb, x));
   return `for (${ival}; ${condt}; ${incr}) {
     ${toStatements(body)}
   }`

@@ -1,4 +1,8 @@
-assert2 = (x, y) => console.assert(equal(x, y));
+allPassed = true;
+assert2 = (x, y) => {
+  console.assert(equal(x, y));
+  if (!equal(x, y)) allPassed = false;
+}
 
 assert2(read('1'), 1);
 assert2(read('"foo bar"'), 'foo bar');
@@ -13,6 +17,4 @@ assert2(cmpl(['cdr', ["'", [1, 2, 3]]]), [2, 3]);
 
 
 
-//console.log('all tests passed');
-//^^why does it get executed after the asseriton failed?
-// assert doesn't throw an error
+if (allPassed) l("All tests passed");
