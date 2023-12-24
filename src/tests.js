@@ -1,4 +1,9 @@
 allPassed = true;
+Array.prototype.kmap = function (fn) {
+  ret = [];
+  Object.keys(this).forEach(k => ret[k] = fn(this[k]));
+  return ret;
+}
 assert2 = (x, y) => {
   console.assert(equal(x, y));
   if (!equal(x, y)) allPassed = false;

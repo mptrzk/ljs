@@ -19,8 +19,7 @@ l(run("(` 1)")); //TODO?
 
 l(run("(` (1 (, l) 3))"));
 
-l(run("(` ((1 (, (+ 1 1)) (,@ (list 3 4 5))) :x 2))"));//TODO fix
-//array.map doesn't work with keys, right?
+l(run("(` ((1 (, (+ 1 1)) (,@ (list 3 4 5))) x 2))"));
 
 
 l(parseExpr('("1 2 " (+ 3 5) 3)'));
@@ -46,6 +45,3 @@ l(run("(concat (' (1 2 3)) (' (4 5 6)))"));
 l(run("(concat (' (1 2 3)) (' (4 :x 5 :y 6)))"));
 
 l(run("(' (4 :x 5 :y 6))"));
-
-l(read("(:x 2 3 :y 3)").kmap(x => 2*x))
-

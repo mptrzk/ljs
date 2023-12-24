@@ -21,15 +21,8 @@ parseList = str => {
   while (str[0] != ')') {
     str = str.trim(); //yeet? move? clean up?
     if (str == '') throw new Error(); //todo make it proper
-    let m = str.match(/^:(\S*)(.*)/);
-    let key;
-    if (m) {
-      key = m[1]; 
-      str = m[2]; 
-    }
     let [first, rest] = parseExpr(str);
-    if (!m) lst.push(first);
-    else lst[key] = first;
+    lst.push(first);
     str = rest; //yeet
   }
   return [lst, str.slice(1)];
@@ -53,11 +46,6 @@ read = code => parseExpr(code)[0];
 
 cmacros = new Map();
 
-Array.prototype.kmap = function (fn) {
-  ret = [];
-  Object.keys(this).forEach(k => ret[k] = fn(this[k]));
-  return ret;
-}
 
 expand = (qb, code) => {
   if (isArray(code)) {
