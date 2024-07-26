@@ -1,4 +1,5 @@
-document.body.innerHTML = '<h1>Hello, World!</h1>';
+cmacros = new Map();
+
 
 l = console.log
 
@@ -12,8 +13,11 @@ equal = (x, y) => {
   }
   return x === y;
 };
+
 isNumeric = x => !isNaN(x);
+
 isArray = Array.isArray;
+
 
 parseList = str => {
   //try {throw Error();} catch(e) {};
@@ -44,36 +48,65 @@ parseExpr = str => {
 read = code => parseExpr(code)[0];
 
 
-cmacros = new Map();
 
 
-expand = (qb, code) => {
+compile = (qb, code) => { //qb contains side effects
   if (isArray(code)) {
     let [op, ...args] = code;
     let m = cmacros.get(op);
-    let a = args.map(x => expand(qb, x));
-    if (m === undefined) return `${op}(${a.toString()})`;
-    return m(qb, ...args);
+    if (m === undefined) {
+      let a = args.map(x => compile(qb, x)); //here first
+      return `${op}(${a.toString()})`;
+    }
+    return m(qb, ...args); //here 2nd??
   }
   return code;
 }
 
-cmpl = code => {
+ljsEval = code => {
   let qb = [];
-  let js = expand(qb, code); 
+  let js = compile(qb, code); 
   return (() => {}).constructor('__quotes', `return ${js};`)(qb);
 }
+// cmpl -> ljsEval
+//should "compile" execute?
 
+run = x => ljsEval(read(x));
+
+//can be simplified to an one liner TODO?
 cdbg = code => {
   let qb = [];
-  let c = expand(qb, read(code));
-  console.log(c);
+  let js = compile(qb, read(code));
+  console.log(js);
 }
 
-run = x => cmpl(read(x));
+rdbg = x => l(run(x));
 
+
+/*
+  //why does it give __quotes[1] instead of __quotes[0]?
+//and it works as expected!
+
+rdbg("(+ 1 (' (1 2 3)))")
+
+
+l(1 + [1, 2, 3])
+*/
+//TODO describe a bug that happened here when the file got
+//reloaded
+//
+//
 
 await wslime.load('src/functions.js');
 await wslime.load('src/cmacros.js');
+//^should those be in the beginning of the file?
+
 await wslime.load('src/tests.js');
 //^^ TODO - can lack of await cause bugs here?
+
+document.body.style = `
+  background-color: #011;
+  font-family: sans-serif;
+  color: #ff8
+`
+document.body.innerText =  '(some lisp like code)';

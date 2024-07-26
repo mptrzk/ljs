@@ -25,7 +25,8 @@ qqextract = expr => {
 //sounds slower
 
 qqsub = (expr, subs) => {
-  return concat(...expr.map(el => {
+  return concat(...expr.map(el => { 
+    //^^ why this concat? a workaround around ,@?
     if (!isArray(el)) return [el];
     if (el[0] == ',') return [subs.shift()]; //how about atoms?
     if (el[0] == ',@') return subs.shift();
@@ -33,12 +34,16 @@ qqsub = (expr, subs) => {
   }));
 }
 
-cmacros.set('`', (qb, arg) => {
+cmacros.set('`', (qb, arg) => { //TODO what is this code doing?
   //let q = cmacros.get("'")(qb, arg);
   let qi = qb.length;
   qb.push(arg);
-  a = qqextract(arg).map(x => expand(qb, x));
-  return `qqsub(__quotes[${qi}], [${a.toString()}])`;
+  try {
+    a = qqextract(arg).map(x => compile(qb, x)); //better name
+  } catch(e) {
+    console.error("it's useless to quasiquote an atom");
+ greturn `qqsub(__quotes[${qi}], [${a.toString()}])`;
+  }
 });
 
 [
@@ -51,7 +56,7 @@ cmacros.set('`', (qb, arg) => {
   'async',
 ].map(op => {
   cmacros.set(op, (qb, arg) => {
-    return `${op} ${expand(qb, arg)}`;
+    return `${op} ${compile(qb, arg)}`;
   });
 });
 
@@ -62,27 +67,27 @@ cmacros.set('`', (qb, arg) => {
 ].map(op => {
   cmacros.set(op, (qb, ...args) => {
     let ret = `${op} ${args[0]}`;
-    if (args.length == 2) ret += ` = ${expand(qb, args[1])}`;
+    if (args.length == 2) ret += ` = ${compile(qb, args[1])}`;
     //TODO error handling
     return ret;
   });
 });
 
-alops = [
+binops = [
   '+', '-', '*', '/', '%',
   '&', '|', '^',
   '&&', '||', '??',
 ];
 
 [
-  ...alops,
-  ...alops.map(x => x + '='),
+  ...binops,
+  ...binops.map(x => x + '='),
   '=', '==', '===',
   '!=', '!==',
   '<', '>', '<=', '>=',
 ].map(op => {
   cmacros.set(op, (qb, ...args) => {
-    let eargs = args.map(x => expand(qb, x));
+    let eargs = args.map(x => compile(qb, x));
     //if (first === undefined) return 0; //TODO for mul it's wrong!
     //remove?
     //return '(' + first + rest.map(x => ' '+ op +' ' + x).join('') + ')';
@@ -91,7 +96,7 @@ alops = [
 });
 
 cmacros.set('++', (qb, arg) => {
-  return `${expand(qb, arg)}++`;
+  return `${compile(qb, arg)}++`;
 });
 
 
@@ -99,15 +104,15 @@ toStatements = (arr) => arr.map(x => x+';').join('\n');
 
 cmacros.set('imp', (qb, ...args) => {
   return `(() => {
-    ${toStatements(args.map(x => expand(qb, x)))}
+    ${toStatements(args.map(x => compile(qb, x)))}
   })()`;
 });
 
 
 cmacros.set('for', (qb, ...args) => {
   let [clause, ...body] = args;
-  let [ival, condt, incr] = clause.map(x => expand(qb, x));
-  body = body.map(x => expand(qb, x));
+  let [ival, condt, incr] = clause.map(x => compile(qb, x));
+  body = body.map(x => compile(qb, x));
   return `for (${ival}; ${condt}; ${incr}) {
     ${toStatements(body)}
   }`

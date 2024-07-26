@@ -1,15 +1,11 @@
 
 l(parseExpr('(1)')[0]);
 
-l(cmpl(["'", ['+']]));
+l(ljsEval(["'", ['+']]));
 
 //cdbg("(' (+))");
 
 cdbg("(imp 1 2 3)");
-
-l(run("(imp (l 1) (return 2))"));
-
-l(qqsub(read("((, foo) (,@ bar) (, baz))"), [1, [2, 3], 4]));
 
 l(qqextract(read("((, foo) (,@ (1 2 3)) (, baz))")));
 
@@ -45,3 +41,16 @@ l(run("(concat (' (1 2 3)) (' (4 5 6)))"));
 l(run("(concat (' (1 2 3)) (' (4 :x 5 :y 6)))"));
 
 l(run("(' (4 :x 5 :y 6))"));
+
+cdbg("(+ 1 (' (1 2 3)))");
+
+cdbg("(' (1 2 3)))");
+
+cdbg("(' (1 2 3)))");
+cdbg("(new (' (1 2 3))))");
+cdbg("(new (new (' (1 2 3)))))");
+cdbg("(new (new (new (' (1 2 3))))))");
+cdbg("(new (new (new (new (' (1 2 3)))))))");
+cdbg("(new (new (new (new (new (' (1 2 3))))))))");
+
+l(1)
