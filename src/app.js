@@ -105,7 +105,7 @@ await wslime.load('src/tests.js');
 
 document.body.style = `
   background-color: #011;
-  font-family: sans-serif;
+  font-family: monospace;
   color: #ff8
 `
-document.body.innerText =  '(some lisp like code)';
+document.body.innerText =  '(some lisp-like code)';

@@ -1,3 +1,5 @@
+await wslime.load('src/tester.js')
+
 allPassed = true;
 
 assert2 = (x, y) => {
