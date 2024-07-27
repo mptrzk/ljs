@@ -1,13 +1,10 @@
 allPassed = true;
-Array.prototype.kmap = function (fn) {
-  ret = [];
-  Object.keys(this).forEach(k => ret[k] = fn(this[k]));
-  return ret;
-}
 
 assert2 = (x, y) => {
   console.assert(equal(x, y));
-  if (!equal(x, y)) allPassed = false;
+  if (!equal(x, y)) {
+    allPassed = false;
+  }
 }
 //that's a useless way of doing things
 //can I print the arguments
@@ -22,7 +19,11 @@ assert2(ljsEval(4), 4);
 //how about string atoms?
 assert2(ljsEval(['&&', ['+', '4', '2'], '!true']), false);
 assert2(ljsEval(["'", [1, 2, 3]]), [1, 2, 3]);
+
 assert2(ljsEval(['cdr', ["'", [1, 2, 3]]]), [2, 3]);
+
+
+
 
 
 

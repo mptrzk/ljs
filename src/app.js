@@ -49,16 +49,15 @@ read = code => parseExpr(code)[0];
 
 
 
-
 compile = (qb, code) => { //qb contains side effects
   if (isArray(code)) {
     let [op, ...args] = code;
     let m = cmacros.get(op);
     if (m === undefined) {
-      let a = args.map(x => compile(qb, x)); //here first
+      let a = args.map(x => compile(qb, x)); 
       return `${op}(${a.toString()})`;
     }
-    return m(qb, ...args); //here 2nd??
+    return m(qb, ...args);
   }
   return code;
 }

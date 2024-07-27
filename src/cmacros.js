@@ -85,6 +85,7 @@ binops = [
   '=', '==', '===',
   '!=', '!==',
   '<', '>', '<=', '>=',
+  'instanceof',
 ].map(op => {
   cmacros.set(op, (qb, ...args) => {
     let eargs = args.map(x => compile(qb, x));
