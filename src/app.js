@@ -1,7 +1,33 @@
-cmacros = new Map();
-
-
 l = console.log
+await wslime.load('src/functions.js');
+await wslime.load('src/cmacros.js');
+await wslime.load('src/tester.js');
+//^should those be in the beginning of the file?
+
+
+
+defException = (name, superclass) => {
+  window[name] = class extends superclass {
+    constructor(message) {
+      super(message);
+      this.name = name;
+    }
+  }
+}
+
+/*
+defException('FooError', Error);
+defException('BarError', Error);
+defException('BazError', BarError);
+
+l(new FooError('foo') instanceof Error);
+l(new FooError('foo') instanceof FooError);
+l(!(new FooError('foo') instanceof BarError));
+l(new BazError('foo') instanceof BarError);
+l(new BazError('foo') instanceof Error);
+*/
+
+
 
 equal = (x, y) => {
   if (typeof(x) == 'object') {
@@ -96,11 +122,7 @@ l(1 + [1, 2, 3])
 //
 //
 
-await wslime.load('src/functions.js');
-await wslime.load('src/cmacros.js');
-//^should those be in the beginning of the file?
 
-await wslime.load('src/tests.js');
 //^^ TODO - can lack of await cause bugs here?
 
 document.body.style = `
@@ -109,3 +131,5 @@ document.body.style = `
   color: #ff8
 `
 document.body.innerText =  '(some lisp-like code)';
+
+await wslime.load('src/tests.js');

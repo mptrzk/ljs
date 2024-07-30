@@ -1,3 +1,5 @@
+cmacros = new Map();
+
 cmacros.set("'", (qb, arg) => {
   let qi = qb.length;
   qb.push(arg);
