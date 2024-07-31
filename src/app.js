@@ -45,12 +45,16 @@ isNumeric = x => !isNaN(x);
 isArray = Array.isArray;
 
 
+defException('ParseError', Error);
+
 parseList = str => {
   //try {throw Error();} catch(e) {};
   let lst = [];
   while (str[0] != ')') {
     str = str.trim(); //yeet? move? clean up?
-    if (str == '') throw new Error(); //todo make it proper
+    if (str == '') {
+      throw new ParseError("')' missing");
+    }
     let [first, rest] = parseExpr(str);
     lst.push(first);
     str = rest; //yeet

@@ -53,16 +53,3 @@ cdbg("(new (new (new (' (1 2 3))))))");
 cdbg("(new (new (new (new (' (1 2 3)))))))");
 cdbg("(new (new (new (new (new (' (1 2 3))))))))");
 
-
-blah = () => {
-  throw 1337;
-}
-
-
-
-
-try {
-  blah();
-} catch (e) {
-  l(e);
-}
