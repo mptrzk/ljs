@@ -44,8 +44,8 @@ cmacros.set('`', (qb, arg) => { //TODO what is this code doing?
     a = qqextract(arg).map(x => compile(qb, x)); //better name
   } catch(e) {
     console.error("it's useless to quasiquote an atom");
- greturn `qqsub(__quotes[${qi}], [${a.toString()}])`;
   }
+  return `qqsub(__quotes[${qi}], [${a.toString()}])`;
 });
 
 [

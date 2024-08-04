@@ -4,7 +4,9 @@ await wslime.load('src/cmacros.js');
 await wslime.load('src/tester.js');
 //^should those be in the beginning of the file?
 
-
+Array.prototype.toString = function () {
+  return `[${this.join(', ')}]`;
+}
 
 defException = (name, superclass) => {
   window[name] = class extends superclass {
@@ -53,15 +55,29 @@ parseList = str => {
   while (str[0] != ')') {
     str = str.trim(); //yeet? move? clean up?
     if (str == '') {
-      throw new ParseError("')' missing");
+      throw new ParseError("closing ')' missing");
     }
-    let [first, rest] = parseExpr(str);
+    let [first, rest] = parseExpr(str); //confusing naming
     lst.push(first);
     str = rest; //yeet
   }
   return [lst, str.slice(1)];
 }
 
+parseExpr = str => {
+  str = str.trim();
+  if (str[0] == '(') return parseList(str.slice(1));
+  if (str[0] == '"') {
+    let match = str.match(/(".*")(.*)/);
+    return [match[1], match[2]];
+  }
+  let match = str.match(/([^)\s]+)(.*)/);
+  let res = match[1];//isNumeric(match[1]) ? parseFloat(match[1]) : match[1];
+  return [res, match[2]];
+  // keys
+}
+
+/*
 parseExpr = str => {
   str = str.trim();
   if (str[0] == '(') return parseList(str.slice(1));
@@ -74,8 +90,13 @@ parseExpr = str => {
   return [res, match[2]];
   // keys
 }
+*/
 
-read = code => parseExpr(code)[0];
+read = code => {
+  let [expr, str] = parseExpr(code);
+  if (str !== '') throw new ParseError('opening "(" missing');
+  return expr
+}
 
 
 
@@ -83,9 +104,9 @@ compile = (qb, code) => { //qb contains side effects
   if (isArray(code)) {
     let [op, ...args] = code;
     let m = cmacros.get(op);
+    let a = args.map(x => compile(qb, x)); 
     if (m === undefined) {
-      let a = args.map(x => compile(qb, x)); 
-      return `${op}(${a.toString()})`;
+      return `${op}(${a.join(', ')})`;
     }
     return m(qb, ...args);
   }
@@ -103,6 +124,7 @@ ljsEval = code => {
 run = x => ljsEval(read(x));
 
 //can be simplified to an one liner TODO?
+//it can, but the result of compilation should contain all the bindings as well
 cdbg = code => {
   let qb = [];
   let js = compile(qb, read(code));
@@ -135,5 +157,6 @@ document.body.style = `
   color: #ff8
 `
 document.body.innerText =  '(some lisp-like code)';
+
 
 await wslime.load('src/tests.js');

@@ -24,14 +24,28 @@ defTestFun('testEqual', (res, val) => {
   return !res.thrown && equal(res.val, val);
 });
 
-testEqual(() => run("(' (1 2 3))"), [1, 2, 3]);
+defTestFun('testLjs',
+  (res, code) => {
+    return !res.thrown && equal(res.val, run(code));
+  },
+  (code) => () => run(code)
+);
+//if you read it after a while it might look like
+//"code" means the same thing
 
-testEqual(() => run("((' (1 2 3))"), [1, 2, 3]);
+//testLjs = (a, b) => testEqual(() => run(a), run(b));
+//kinda breaks
 
-testEqual(() => run("(' (1 2 3))"), [1, 2, 2, 3]);
+testLjs('(list 1 2 3)', '(list 1 2 3)');
 
-testEqual(() => read('"1"'), '1');
+testEqual(() => read('1'), '1');
+testEqual(() => read('"1"'), '"1"');
+testEqual(() => read('"1 dfdf"'), '"1 dfdf"');
+testEqual(() => read('(1 2 3)'), ['1', '2', '3']);
+testEx(() => read('(1 2 3))'), ParseError);
+//TODO tests for exceptions
 
+testEqual(() => run("(' (1 2 3))"), ['1', '2', '3']);
 testEx(() => read('(1'), ParseError);
 
 
