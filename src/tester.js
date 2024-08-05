@@ -6,7 +6,43 @@ resf = f => {
   }
 }
 
+stringify = (x, depth=0) => {
+  if (typeof(x) === 'function') {
+    if (x.name) return x.name;
+    if (x.pname) return x.pname; //is this necessary?
+    //using let instead of window[fsdfds] for defException
+    //no, you can't use "let"
+    return x.toString();
+  }
+  if (typeof(x) === 'object') {
+    if (x === null) return 'null';
+    if (x instanceof Array) {
+      if (depth === 0) return `[${x.length ? '...' : ''}]`;
+      return `[${x.map(y => stringify(y, depth - 1)).join(', ')}]`;
+    }
+      if (depth === 0) return `{${x.length ? '...' : ''}}`;
+      let content = Object.entries(x)
+      .map(([k, v]) => `${k}: ${stringify(v, depth - 1)}`)
+      .join(', ');
+    return `{${content}}`;
+  }
+  if (typeof(x) === 'string') {
+    if (x.includes("'")) {
+      if (x.includes('"')) {
+        return `'${x.replace("'", "\\'")}'`;
+      }
+      return `"${x}"`;
+    }
+    return `'${x}'`;
+  }
+  return x.toString();
+}
+
+
 testMsg = (name, code, args, res) => {
+  [name, code, val] = [name, code, res.val]
+    .map(x => stringify(x, 2));
+  args = args.map(x => stringify(x, 0));
   window.allPassed = false;
   //TODO come up with a good abstraction to do it
   let link = document.createElement('a');
@@ -19,7 +55,7 @@ testMsg = (name, code, args, res) => {
     : 'returned value';
   console.error(
     `${name}(${code}, ${args.join(', ')}) failed\n`
-    + `${tdesc}:\n${res.val}\n`
+    + `${tdesc}:\n${val}\n`
     //+ res.thrown ? res.val.stack : '' //TODO ???
   );
 }

@@ -15,6 +15,7 @@ defException = (name, superclass) => {
       this.name = name;
     }
   }
+  window[name].pname = name;
 }
 
 /*
