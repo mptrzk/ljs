@@ -28,8 +28,11 @@ test(exoreq, run, [
   [3, '(+ 1 2)'],
   [['1', ['2', '3'], '4'], "(' (1 (2 3) 4))"],
   [1, '(car (L 1 2 3))'],
-  [[2, 3, 3], '(cdr (L 1 2 3))'],
+  [[1, 2, 3], '(cdr (L 1 2 3))'],
 ])
 
+test(exoreq, x => x, [[1, 0]]);
+
+test(exoreq, x => x, [[0, 3]]);
 
 if (allPassed) l("All tests passed");

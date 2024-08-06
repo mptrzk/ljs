@@ -66,10 +66,11 @@ dbglink = (fn, args) => {
   link.style.color = 'cyan';
   link.style.textDecoration = 'underline'; //TODO <a> tag?
   let fntxt = stringify(fn);
+  if (!fn.name && !fn.pname) fntxt = `(${fntxt})`;
   let argtxt = args.map(stringify).join(', ');
   link.innerText = `${fntxt}(${argtxt})`;
   link.onclick = () => {debugger; fn(...args);};
-  document.body.innerHTML += '<br>';
+  //document.body.innerHTML += '<br>'; TODO why this breaks onclick?
   document.body.appendChild(link);
 }
 
