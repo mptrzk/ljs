@@ -4,9 +4,6 @@ await wslime.load('src/cmacros.js');
 await wslime.load('src/tester.js');
 //^should those be in the beginning of the file?
 
-Array.prototype.toString = function () {
-  return `[${this.join(', ')}]`;
-}
 
 defException = (name, superclass) => {
   window[name] = class extends superclass {
@@ -67,9 +64,10 @@ parseList = str => {
 
 parseExpr = str => {
   str = str.trim();
+  if (str == ')') throw new ParseError('opening "(" missing');
   if (str[0] == '(') return parseList(str.slice(1));
   if (str[0] == '"') {
-    let match = str.match(/(".*")(.*)/);
+    let match = str.match(/(".*?")(.*)/);
     return [match[1], match[2]];
   }
   let match = str.match(/([^)\s]+)(.*)/);
@@ -94,6 +92,10 @@ parseExpr = str => {
 */
 
 read = code => {
+  if (typeof(code) !== 'string') {
+    throw new ParseError('not a string');
+    //should I include the argument in the error message?
+  }
   let [expr, str] = parseExpr(code);
   if (str !== '') throw new ParseError('opening "(" missing');
   return expr

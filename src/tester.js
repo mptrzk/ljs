@@ -1,11 +1,3 @@
-resf = f => {
-  try {
-    return {val: f(), thrown: false};
-  } catch (e) {
-    return {val: e, thrown: true};
-  }
-}
-
 stringify = (x, depth=0) => {
   if (typeof(x) === 'function') {
     if (x.name) return x.name;
@@ -45,11 +37,6 @@ testMsg = (name, code, args, res) => {
   args = args.map(x => stringify(x, 0));
   window.allPassed = false;
   //TODO come up with a good abstraction to do it
-  let link = document.createElement('a');
-  link.innerText = code.toString();
-  link.href = `javascript:{debugger; (${code.toString()})();}`;
-  document.body.innerHTML += '<br>';
-  document.body.appendChild(link);
   let tdesc = res.thrown ?
     'exception was thrown'
     : 'returned value';
@@ -70,3 +57,40 @@ defTestFun = (name, predicate, prepf) => {
     return false;
   }
 }
+
+
+
+//edge case - stuff with pname?
+dbglink = (fn, args) => {
+  let link = document.createElement('a');
+  link.innerText = `${fn}(${args})`;
+  link.onclick = () => fn(...args);
+  document.body.innerHTML += '<br>';
+  document.body.appendChild(link);
+}
+
+
+tmsg = (fn, args, res, ref) => {
+  [fn, res, ref] = [fn, res, ref].map(stringify); 
+  args = args.map(stringify).join(', ');
+  console.error(
+    `[FAILED] ${ref} ~~ ${fn}(${args})\n` 
+    + `result:\n`
+    + `${res}`
+  );
+}
+
+test = (pred, fn, tests) => 
+  tests.map(([ref, ...args]) => {
+    let res; 
+    try {
+      res = fn(...args);
+    } catch (e) {
+      res = e;
+    }
+    if (pred(ref, res)) return true;
+    tmsg(fn, args, res, ref);
+    dbglink(fn, args);
+    allPassed = false; //TODO remove?
+    return false;
+  });
