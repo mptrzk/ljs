@@ -62,9 +62,13 @@ defTestFun = (name, predicate, prepf) => {
 
 //edge case - stuff with pname?
 dbglink = (fn, args) => {
-  let link = document.createElement('a');
-  link.innerText = `${fn}(${args})`;
-  link.onclick = () => fn(...args);
+  let link = document.createElement('div');
+  link.style.color = 'cyan';
+  link.style.textDecoration = 'underline'; //TODO <a> tag?
+  let fntxt = stringify(fn);
+  let argtxt = args.map(stringify).join(', ');
+  link.innerText = `${fntxt}(${argtxt})`;
+  link.onclick = () => {debugger; fn(...args);};
   document.body.innerHTML += '<br>';
   document.body.appendChild(link);
 }
