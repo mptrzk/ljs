@@ -31,35 +31,6 @@ stringify = (x, depth=0) => {
 }
 
 
-testMsg = (name, code, args, res) => {
-  [name, code, val] = [name, code, res.val]
-    .map(x => stringify(x, 2));
-  args = args.map(x => stringify(x, 0));
-  window.allPassed = false;
-  //TODO come up with a good abstraction to do it
-  let tdesc = res.thrown ?
-    'exception was thrown'
-    : 'returned value';
-  console.error(
-    `${name}(${code}, ${args.join(', ')}) failed\n`
-    + `${tdesc}:\n${val}\n`
-    //+ res.thrown ? res.val.stack : '' //TODO ???
-  );
-}
-
-//predicate has form (result, ...args) -> bool
-defTestFun = (name, predicate, prepf) => {
-  window[name] = (code, ...args) => {
-    let thunk = prepf ? prepf(code) : code;
-    let res = resf(thunk);
-    if (predicate(res, ...args)) return true;
-    testMsg(name, code, args, res);
-    return false;
-  }
-}
-
-
-
 //edge case - stuff with pname?
 dbglink = (fn, args) => {
   let link = document.createElement('div');
@@ -70,7 +41,6 @@ dbglink = (fn, args) => {
   let argtxt = args.map(stringify).join(', ');
   link.innerText = `${fntxt}(${argtxt})`;
   link.onclick = () => {debugger; fn(...args);};
-  //document.body.innerHTML += '<br>'; TODO why this breaks onclick?
   document.body.appendChild(link);
 }
 
@@ -85,8 +55,11 @@ tmsg = (fn, args, res, ref) => {
   );
 }
 
+
 test = (pred, fn, tests) => 
-  tests.map(([ref, ...args]) => {
+  tests.map(expr => {
+    let args = expr.slice(0, -1);
+    let ref = expr[expr.length - 1];
     let res; 
     try {
       res = fn(...args);
