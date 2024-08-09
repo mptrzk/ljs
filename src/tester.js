@@ -1,4 +1,5 @@
-stringify = (x, depth=0) => {
+stringify = (x, depth=4) => {
+  if (x === undefined) return 'undefined';
   if (typeof(x) === 'function') {
     if (x.name) return x.name;
     if (x.pname) return x.pname; //is this necessary?
@@ -46,8 +47,8 @@ dbglink = (fn, args) => {
 
 
 tmsg = (fn, args, res, ref) => {
-  [fn, res, ref] = [fn, res, ref].map(stringify); 
-  args = args.map(stringify).join(', ');
+  [fn, res, ref] = [fn, res, ref].map(x => stringify(x)); 
+  args = args.map(x => stringify(x)).join(', ');
   console.error(
     `[FAILED] ${ref} ~~ ${fn}(${args})\n` 
     + `result:\n`
