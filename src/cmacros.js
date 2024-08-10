@@ -1,29 +1,22 @@
 cmacros = new Map();
 
-/*
-cmacros.set("'", (qb, arg) => {
-  let qi = qb.length;
-  qb.push(arg);
-  return `__quotes[${qi}]`;
-});
-*/
 
-quote = (qb, arg) => {
+quote = (arg) => {
   if (arg instanceof Array) {
-    return `[${arg.map(x => quote(qb, x)).join(', ')}]`;
+    return `[${arg.map(quote).join(', ')}]`;
   }
   return `'${arg}'`;
 }
 cmacros.set("'", quote);
 
 
-qquote = (qb, arg) => {
+qquote = (arg) => {
   if (arg instanceof Array) {
-    if (arg[0] == ',') return compile(qb, arg[1]);
+    if (arg[0] == ',') return compile(arg[1]);
     if (arg[0] == ',@') {
-      return `...${compile(qb, arg[1])}`;
+      return `...${compile(arg[1])}`;
     }
-    return `[${arg.map(x => qquote(qb, x)).join(', ')}]`;
+    return `[${arg.map(qquote).join(', ')}]`;
   }
   return `'${arg}'`;
 }
@@ -58,19 +51,6 @@ qqsub = (expr, subs) => {
   }));
 }
 
-/*
-cmacros.set('`', (qb, arg) => { //TODO what is this code doing?
-  //let q = cmacros.get("'")(qb, arg);
-  let qi = qb.length;
-  qb.push(arg);
-  try {
-    a = qqextract(arg).map(x => compile(qb, x)); //better name
-  } catch(e) {
-    console.error("it's useless to quasiquote an atom");
-  }
-  return `qqsub(__quotes[${qi}], [${a.toString()}])`;
-});
-*/
 
 [
   'return',
@@ -81,8 +61,8 @@ cmacros.set('`', (qb, arg) => { //TODO what is this code doing?
   'await',
   'async',
 ].map(op => {
-  cmacros.set(op, (qb, arg) => {
-    return `${op} ${compile(qb, arg)}`;
+  cmacros.set(op, (arg) => {
+    return `${op} ${compile(arg)}`;
   });
 });
 
@@ -91,9 +71,9 @@ cmacros.set('`', (qb, arg) => { //TODO what is this code doing?
   'let',
   'var',
 ].map(op => {
-  cmacros.set(op, (qb, ...args) => {
+  cmacros.set(op, (...args) => {
     let ret = `${op} ${args[0]}`;
-    if (args.length == 2) ret += ` = ${compile(qb, args[1])}`;
+    if (args.length == 2) ret += ` = ${compile(args[1])}`;
     //TODO error handling
     return ret;
   });
@@ -113,8 +93,8 @@ binops = [
   '<', '>', '<=', '>=',
   'instanceof',
 ].map(op => {
-  cmacros.set(op, (qb, ...args) => {
-    let eargs = args.map(x => compile(qb, x));
+  cmacros.set(op, (...args) => {
+    let eargs = args.map(compile);
     //if (first === undefined) return 0; //TODO for mul it's wrong!
     //remove?
     //return '(' + first + rest.map(x => ' '+ op +' ' + x).join('') + ')';
@@ -122,35 +102,35 @@ binops = [
   }); //^^ TODO use `${...}`?
 });
 
-cmacros.set('++', (qb, arg) => {
-  return `${compile(qb, arg)}++`;
+cmacros.set('++', (arg) => {
+  return `${compile(arg)}++`;
 });
 
 
 toStatements = (arr) => arr.map(x => x+';').join('\n');
 
-cmacros.set('imp', (qb, ...args) => {
+cmacros.set('imp', (...args) => {
   return `(() => {
-    ${toStatements(args.map(x => compile(qb, x)))}
+    ${toStatements(args.map(compile))}
   })()`;
 });
 
 
-cmacros.set('for', (qb, ...args) => {
+cmacros.set('for', (...args) => {
   let [clause, ...body] = args;
-  let [ival, condt, incr] = clause.map(x => compile(qb, x));
-  body = body.map(x => compile(qb, x));
+  let [ival, condt, incr] = clause.map(compile);
+  body = body.map(compile);
   return `for (${ival}; ${condt}; ${incr}) {
     ${toStatements(body)}
   }`
 });
 
-cmacros.set('blk', (qb, ...args) => {
-  return `{${toStatements(args.map(x => compile(qb, x)))}}`;
+cmacros.set('blk', (...args) => {
+  return `{${toStatements(args.map(compile))}}`;
 })
 
 /*
-cmacros.set('fn', (qb, ...args) => {
+cmacros.set('fn', (...args) => {
   return `(${arg[0].join(', ')}) =>`
 })
 */

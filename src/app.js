@@ -15,18 +15,6 @@ defException = (name, superclass) => {
   window[name].pname = name;
 }
 
-/*
-defException('FooError', Error);
-defException('BarError', Error);
-defException('BazError', BarError);
-
-l(new FooError('foo') instanceof Error);
-l(new FooError('foo') instanceof FooError);
-l(!(new FooError('foo') instanceof BarError));
-l(new BazError('foo') instanceof BarError);
-l(new BazError('foo') instanceof Error);
-*/
-
 
 
 equal = (x, y) => {
@@ -103,37 +91,35 @@ read = code => {
 
 
 
-compile = (qb, code) => { //qb contains side effects
-  if (isArray(code)) {
-    let [op, ...args] = code;
+compile = (expr) => { //qb contains side effects
+  if (isArray(expr)) {
+    let [op, ...args] = expr;
     let m = cmacros.get(op);
-    let a = args.map(x => compile(qb, x)); 
+    let a = args.map(compile); 
     if (m === undefined) {
       return `${op}(${a.join(', ')})`;
     }
-    return m(qb, ...args);
+    return m(...args);
   }
-  return code;
+  return expr;
 }
 
+/*
 ljsEval = code => {
-  let qb = [];
-  let js = compile(qb, code); 
+  let js = compile(code); 
   return (() => {}).constructor('__quotes', `return ${js};`)(qb);
 }
-// cmpl -> ljsEval
+*/
 //should "compile" execute?
+
+ljsEval = expr => eval(compile(expr));
 
 run = x => ljsEval(read(x));
 
 //can be simplified to an one liner TODO?
 //it can, but the result of compilation should contain all the bindings as well
-cdbg = code => {
-  let qb = [];
-  let js = compile(qb, read(code));
-  console.log(js);
-}
 
+cdbg = x => l(compile(read(x)))
 rdbg = x => l(run(x));
 
 

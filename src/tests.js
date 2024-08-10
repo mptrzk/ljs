@@ -5,10 +5,13 @@ allPassed = true;
 isSubclass = (A, B) => A.prototype instanceof B || A === B;
 //TODO - understand
 
+
+//TODO flip order of arguments
 exoreq = (ref, res) =>
   (isSubclass(ref, Error) && res instanceof ref) 
   || equal(ref, res);
 
+//test exoreq?
 
 test(exoreq, stringify, [
   [stringify, 'stringify'],
@@ -30,8 +33,10 @@ test(exoreq, read, [
 ]);
 
 test(exoreq, run, [
-  ["(' (1 (2 \"l\") 4))", ['1', ['2', '"l"'], '4']],
-  ["(` (1 (2 (, (+ 1 2))) (,@ (L 4 5))))", ['1', ['2', 3], 4, 5]],
+  ["(' (1 (2 \"l\") 4))", 
+    ['1', ['2', '"l"'], '4']],
+  ["(` (1 (2 (, (+ 1 2))) (,@ (L 4 5))))",
+    ['1', ['2', 3], 4, 5]],
   ['(car (L 1 2 3 4))', 1],
   ['(cdr (L 1 2 3 4))', [2, 3, 4]],
 ])
