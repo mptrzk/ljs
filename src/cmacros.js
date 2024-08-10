@@ -49,6 +49,7 @@ cmacros.set("`", qquote);
     return ret;
   });
 });
+//TODO destructuring
 
 binops = [
   '+', '-', '*', '/', '%',
@@ -56,6 +57,8 @@ binops = [
   '&&', '||', '??',
 ];
 
+//TODO destructuring in case of "="
+//  turning it walrus?
 [
   ...binops,
   ...binops.map(x => x + '='),
@@ -100,11 +103,13 @@ cmacros.set('blk', (...args) => {
   return `{${toStatements(args.map(compile))}}`;
 })
 
-/*
-cmacros.set('fn', (...args) => {
-  return `(${arg[0].join(', ')}) =>`
+cmacros.set('fn', (args, body) => {
+  return `(${args.join(', ')}) => ${compile(body)}`;
 })
-*/
+//TODO destructuring
+
+
+
 //do I want implicit progn?
 //  l8r
 //  check how many args you get

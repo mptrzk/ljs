@@ -16,7 +16,6 @@ defException = (name, superclass) => {
 }
 
 
-
 equal = (x, y) => {
   if (typeof(x) == 'object') {
     if (typeof(y) != 'object') return false;
@@ -28,8 +27,8 @@ equal = (x, y) => {
   return x === y;
 };
 
-isNumeric = x => !isNaN(x);
 
+isNumeric = x => !isNaN(x);
 isArray = Array.isArray;
 
 
@@ -49,6 +48,7 @@ parseList = str => {
   }
   return [lst, str.slice(1)];
 }
+
 
 parseExpr = str => {
   str = str.trim();
@@ -79,9 +79,13 @@ read = code => {
 compile = (expr) => {
   if (isArray(expr)) {
     let [op, ...args] = expr;
+    if (isArray(op)) {
+      let a = args.map(compile); 
+      return `(${compile(op)})(${a.join(', ')})`;
+    }
     let m = cmacros.get(op);
-    let a = args.map(compile); 
     if (m === undefined) {
+      let a = args.map(compile); //TODO remove redundancy?
       return `${op}(${a.join(', ')})`;
     }
     return m(...args);
@@ -91,10 +95,7 @@ compile = (expr) => {
 
 
 ljsEval = expr => eval(compile(expr));
-
 run = x => ljsEval(read(x));
-
-
 cdbg = x => l(compile(read(x)))
 rdbg = x => l(run(x));
 
@@ -109,3 +110,5 @@ document.body.innerText =  '(some lisp-like code)';
 
 
 await wslime.load('src/tests.js');
+
+//wslime.eval = rdbg;
