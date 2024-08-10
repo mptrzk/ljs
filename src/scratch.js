@@ -53,3 +53,6 @@ cdbg("(new (new (new (' (1 2 3))))))");
 cdbg("(new (new (new (new (' (1 2 3)))))))");
 cdbg("(new (new (new (new (new (' (1 2 3))))))))");
 
+
+rdbg("(' ())")
+

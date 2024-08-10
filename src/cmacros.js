@@ -1,11 +1,33 @@
 cmacros = new Map();
 
+/*
 cmacros.set("'", (qb, arg) => {
   let qi = qb.length;
   qb.push(arg);
   return `__quotes[${qi}]`;
 });
+*/
 
+quote = (qb, arg) => {
+  if (arg instanceof Array) {
+    return `[${arg.map(x => quote(qb, x)).join(', ')}]`;
+  }
+  return `'${arg}'`;
+}
+cmacros.set("'", quote);
+
+
+qquote = (qb, arg) => {
+  if (arg instanceof Array) {
+    if (arg[0] == ',') return compile(qb, arg[1]);
+    if (arg[0] == ',@') {
+      return `...${compile(qb, arg[1])}`;
+    }
+    return `[${arg.map(x => qquote(qb, x)).join(', ')}]`;
+  }
+  return `'${arg}'`;
+}
+cmacros.set("`", qquote);
 
 qqextractRec = (expr, lst) => {
   expr.map(el => {
@@ -36,6 +58,7 @@ qqsub = (expr, subs) => {
   }));
 }
 
+/*
 cmacros.set('`', (qb, arg) => { //TODO what is this code doing?
   //let q = cmacros.get("'")(qb, arg);
   let qi = qb.length;
@@ -47,6 +70,7 @@ cmacros.set('`', (qb, arg) => { //TODO what is this code doing?
   }
   return `qqsub(__quotes[${qi}], [${a.toString()}])`;
 });
+*/
 
 [
   'return',
@@ -120,3 +144,21 @@ cmacros.set('for', (qb, ...args) => {
     ${toStatements(body)}
   }`
 });
+
+cmacros.set('blk', (qb, ...args) => {
+  return `{${toStatements(args.map(x => compile(qb, x)))}}`;
+})
+
+/*
+cmacros.set('fn', (qb, ...args) => {
+  return `(${arg[0].join(', ')}) =>`
+})
+*/
+//do I want implicit progn?
+//  l8r
+//  check how many args you get
+//  do the implicit progn if more than 1 body args 
+//  how about documentation string
+//    do that as well
+//    but first make something that works
+
