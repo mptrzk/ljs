@@ -22,35 +22,6 @@ qquote = (arg) => {
 }
 cmacros.set("`", qquote);
 
-qqextractRec = (expr, lst) => {
-  expr.map(el => {
-    if (!isArray(el)) return;
-    if (el[0] == ',' || el[0] == ',@') {
-      lst.push(el[1]);
-      return;
-    }
-    qqextractRec(el, lst);
-  });
-}
-
-qqextract = expr => {
-  let lst = [];
-  qqextractRec(expr, lst);
-  return lst;
-}
-//^^ without rec, using concat or something?
-//sounds slower
-
-qqsub = (expr, subs) => {
-  return concat(...expr.map(el => { 
-    //^^ why this concat? a workaround around ,@?
-    if (!isArray(el)) return [el];
-    if (el[0] == ',') return [subs.shift()]; //how about atoms?
-    if (el[0] == ',@') return subs.shift();
-    return [qqsub(el, subs)];
-  }));
-}
-
 
 [
   'return',

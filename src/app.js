@@ -59,25 +59,10 @@ parseExpr = str => {
     return [match[1], match[2]];
   }
   let match = str.match(/([^)\s]+)(.*)/);
-  let res = match[1];//isNumeric(match[1]) ? parseFloat(match[1]) : match[1];
+  let res = match[1];
   return [res, match[2]];
-  // keys
 }
 
-/*
-parseExpr = str => {
-  str = str.trim();
-  if (str[0] == '(') return parseList(str.slice(1));
-  if (str[0] == '"') {
-    let match = str.match(/"(.*)"(.*)/);
-    return [match[1], match[2]];
-  }
-  let match = str.match(/([^)\s]+)(.*)/);
-  let res = isNumeric(match[1]) ? parseFloat(match[1]) : match[1];
-  return [res, match[2]];
-  // keys
-}
-*/
 
 read = code => {
   if (typeof(code) !== 'string') {
@@ -86,12 +71,12 @@ read = code => {
   }
   let [expr, str] = parseExpr(code);
   if (str !== '') throw new ParseError('opening "(" missing');
-  return expr
+  return expr;
 }
 
 
 
-compile = (expr) => { //qb contains side effects
+compile = (expr) => {
   if (isArray(expr)) {
     let [op, ...args] = expr;
     let m = cmacros.get(op);
@@ -104,41 +89,16 @@ compile = (expr) => { //qb contains side effects
   return expr;
 }
 
-/*
-ljsEval = code => {
-  let js = compile(code); 
-  return (() => {}).constructor('__quotes', `return ${js};`)(qb);
-}
-*/
-//should "compile" execute?
 
 ljsEval = expr => eval(compile(expr));
 
 run = x => ljsEval(read(x));
 
-//can be simplified to an one liner TODO?
-//it can, but the result of compilation should contain all the bindings as well
 
 cdbg = x => l(compile(read(x)))
 rdbg = x => l(run(x));
 
 
-/*
-  //why does it give __quotes[1] instead of __quotes[0]?
-//and it works as expected!
-
-rdbg("(+ 1 (' (1 2 3)))")
-
-
-l(1 + [1, 2, 3])
-*/
-//TODO describe a bug that happened here when the file got
-//reloaded
-//
-//
-
-
-//^^ TODO - can lack of await cause bugs here?
 
 document.body.style = `
   background-color: #011;
