@@ -94,9 +94,8 @@ compile = (expr) => {
 }
 
 
-ljsEval = expr => eval(compile(expr));
-run = x => ljsEval(read(x));
-cdbg = x => l(compile(read(x)))
+run = x => eval(compile(read(x)));
+cdbg = x => l(compile(read(x)));
 rdbg = x => l(run(x));
 
 
@@ -111,4 +110,7 @@ document.body.innerText =  '(some lisp-like code)';
 
 await wslime.load('src/tests.js');
 
-//wslime.eval = rdbg;
+wslime.eval = x => 
+  (x === 'location.reload()\n')
+  ? location.reload()
+  : rdbg(x);

@@ -23,7 +23,29 @@ qquote = (arg) => {
 cmacros.set("`", qquote);
 
 
+cmacros.set('[', (...args) => {
+  return `[${args.map(compile).join(', ')}]`;
+});
+
+kvpair = ([k, v]) => {
+  return isArray(k)
+    ? `[${compile(k[0])}]: ${compile(v)}`
+    : `${k}: ${compile(v)}`;
+}
+
+cmacros.set('{', (...args) => {
+  return `({${args.map(kvpair).join(', ')}})`; //adding parens?
+});
+
+cmacros.set('@', (arr, ...args) => {
+  return compile(arr) + args.map(x => `[${compile(x)}]`).join('');
+});
+
+
+
+
 [
+  '...',
   'return',
   'yield',
   'throw',
@@ -65,20 +87,26 @@ binops = [
   '=', '==', '===',
   '!=', '!==',
   '<', '>', '<=', '>=',
-  'instanceof',
+  '.', 'instanceof',
 ].map(op => {
   cmacros.set(op, (...args) => {
     let eargs = args.map(compile);
     //if (first === undefined) return 0; //TODO for mul it's wrong!
     //remove?
     //return '(' + first + rest.map(x => ' '+ op +' ' + x).join('') + ')';
-    return '(' + eargs.join(' '+op+' ') + ')';
-  }); //^^ TODO use `${...}`?
+    return `(${eargs.join(` ${op} `)})`;
+  })
 });
 
 cmacros.set('++', (arg) => {
   return `${compile(arg)}++`;
 });
+
+/*
+cmacros.set('?', (arg) => {
+  TODO
+});
+*/
 
 
 toStatements = (arr) => arr.map(x => x+';').join('\n');
@@ -89,6 +117,9 @@ cmacros.set('imp', (...args) => {
   })()`;
 });
 
+cmacros.set('blk', (...args) => {
+  return `{${toStatements(args.map(compile))}}`;
+})
 
 cmacros.set('for', (...args) => {
   let [clause, ...body] = args;
@@ -99,9 +130,6 @@ cmacros.set('for', (...args) => {
   }`
 });
 
-cmacros.set('blk', (...args) => {
-  return `{${toStatements(args.map(compile))}}`;
-})
 
 cmacros.set('fn', (args, body) => {
   return `(${args.join(', ')}) => ${compile(body)}`;
