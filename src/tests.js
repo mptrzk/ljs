@@ -40,10 +40,20 @@ test(exoreq, run, [
     ['1', ['2', 3], 4, 5]],
   ['(car (L 1 2 3 4))', 1],
   ['(cdr (L 1 2 3 4))', [2, 3, 4]],
+  ['(@ ([ 1 ([ 2 3) 4) 1 0)', 2],
+  ['(. ({ (x 1) (y 2)) y)', 2],
+  ['(. ({ (x 1) (((+ "x" "y")) 2)) xy)', 2],
   ['((fn (x) (+ x 2)) 4)', 6],
   ['(((fn (x) (fn (y) (+ x y))) 2) 4)', 6],
   ['(throw (new TypeError))', Error],
+  ['((fn (([ x y)) y) ([ 1 2))', 2],
+  ['((fn (([ x (= y 2))) y) ([ 1))', 2],
+  //['((fn (({ x y})) y) ({ (x 1) (y 2) (z 3)))', 2],
+  //TODO how to catch errors like that?
+  ['((fn (({ x y)) y) ({ (x 1) (y 2) (z 3)))', 2],
+  ['((fn (({ x (y a))) a) ({ (x 1) (y 2) (z 3)))', 2],
 ])
+//TODO throw a nice error when the test list is malformed
 
 //['(((fn (x) (fn (y) (x + y))) 2) 4)', 6],
 //['(throw new TypeError)', Error], //should this work?

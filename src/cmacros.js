@@ -27,14 +27,14 @@ cmacros.set('[', (...args) => {
   return `[${args.map(compile).join(', ')}]`;
 });
 
-kvpair = ([k, v]) => {
+objrec = ([k, v]) => {
   return isArray(k)
     ? `[${compile(k[0])}]: ${compile(v)}`
     : `${k}: ${compile(v)}`;
 }
 
 cmacros.set('{', (...args) => {
-  return `({${args.map(kvpair).join(', ')}})`; //adding parens?
+  return `({${args.map(objrec).join(', ')}})`; //adding parens?
 });
 
 cmacros.set('@', (arr, ...args) => {
@@ -101,12 +101,15 @@ binops = [
 cmacros.set('++', (arg) => {
   return `${compile(arg)}++`;
 });
-
-/*
-cmacros.set('?', (arg) => {
-  TODO
+cmacros.set('--', (arg) => {
+  return `${compile(arg)}--`;
 });
-*/
+
+cmacros.set('?', (cond, expr1, expr2) => {
+  expr2 ??= null;
+  return `(${cond}) ? (${expr1}) : (${expr2})`;
+});
+//TODO test
 
 
 toStatements = (arr) => arr.map(x => x+';').join('\n');
@@ -131,8 +134,40 @@ cmacros.set('for', (...args) => {
 });
 
 
+objrecArg = (arg) => {
+  if (isArray(arg)) {
+    let [k, v] = arg;
+    return isArray(k)
+      ? `[${compile(k[0])}]: ${compileArg(v)}`
+      : `${k}: ${compileArg(v)}`;
+  }
+  return arg;
+}
+
+compileArg = x => {
+  if (isArray(x)) {
+    let [op, ...args] = x;
+    //map args with compileArg?
+    if (op == '...') return `...${compileArg(args[0])}`;
+    if (op == '=') { //special case for destructuring?
+      return `${compileArg(args[0])}=${compile(args[1])}`
+    }
+    if (op == '[') {
+      return `[${args.map(compileArg).join(', ')}]`;
+    }
+    if (op == '{') {
+      return `{${args.map(objrecArg).join(', ')}}`;
+    }
+  }
+  return x;
+}
+//but this should also be used for destructuring assingment...
+//  how about simplifying it?
+
 cmacros.set('fn', (args, body) => {
-  return `(${args.join(', ')}) => ${compile(body)}`;
+  return `(${args.map(compileArg).join(', ')}) => 
+            ${compile(body)}
+  `;
 })
 //TODO destructuring
 
