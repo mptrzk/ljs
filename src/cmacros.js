@@ -11,16 +11,30 @@ cmacros.set("'", quote);
 
 
 qquote = (arg) => {
-  if (arg instanceof Array) {
+  if (arg instanceof Array) { //TODO isArray?
     if (arg[0] == ',') return compile(arg[1]);
     if (arg[0] == ',@') {
       return `...${compile(arg[1])}`;
     }
     return `[${arg.map(qquote).join(', ')}]`;
   }
-  return `'${arg}'`;
+  return `'${arg}'`; 
 }
 cmacros.set("`", qquote);
+//are there problems when arg contains "'"?
+//  yeah
+
+aeqquote = (arg) => {
+  if (arg instanceof Array) {
+    if (arg[0] == ',') return compile(arg[1]);
+    if (arg[0] == ',@') {
+      return `...${compile(arg[1])}`;
+    }
+    return `[${arg.map(aeqquote).join(', ')}]`;
+  }
+  return `${arg}`;
+}
+cmacros.set("`a", aeqquote);
 
 
 cmacros.set('[', (...args) => {

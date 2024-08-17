@@ -55,10 +55,10 @@ parseExpr = str => {
   if (str == ')') throw new ParseError('opening "(" missing');
   if (str[0] == '(') return parseList(str.slice(1));
   if (str[0] == '"') {
-    let match = str.match(/(".*?")(.*)/);
+    let match = str.match(/(".*?")([\s\S]*)/);
     return [match[1], match[2]];
   }
-  let match = str.match(/([^)\s]+)(.*)/);
+  let match = str.match(/([^)\s]+)([\s\S]*)/);
   let res = match[1];
   return [res, match[2]];
 }
@@ -94,7 +94,7 @@ compile = (expr) => {
 }
 
 
-run = x => eval(compile(read(x)));
+run = x => eval?.(compile(read(x)));
 cdbg = x => l(compile(read(x)));
 rdbg = x => l(run(x));
 
@@ -110,9 +110,8 @@ document.body.innerText =  '(some lisp-like code)';
 
 await wslime.load('src/tests.js');
 
-/*
+
 wslime.eval = x => 
   (x === 'location.reload()\n')
   ? location.reload()
   : rdbg(x);
-*/

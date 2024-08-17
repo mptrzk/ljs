@@ -27,10 +27,16 @@ test(exoreq, stringify, [
 
 test(exoreq, read, [
   ['(1)', ['1']],
+  ['(1 2)', ['1', '2']],
+  ['(1 \n 2)', ['1', '2']],
   ['(', ParseError],
   [')', ParseError],
   ['("a" "b")', ['"a"', '"b"']]
 ]);
+
+//['(1 \n 2)', ['1', '2']], //why is it uncaught
+//because you set wslime to run ljs
+
 
 test(exoreq, run, [
   ["(== (+ 1 2) (- 6 3))", true],

@@ -13,8 +13,11 @@ stringify = (x, depth=4) => {
       if (depth === 0) return `[${x.length ? '...' : ''}]`;
       return `[${x.map(y => stringify(y, depth - 1)).join(', ')}]`;
     }
-      if (depth === 0) return `{${x.length ? '...' : ''}}`;
-      let content = Object.entries(x)
+    if (x.toString !== Object.prototype.toString) {
+      return x.toString();
+    }
+    if (depth === 0) return `{${x.length ? '...' : ''}}`;
+    let content = Object.entries(x)
       .map(([k, v]) => `${k}: ${stringify(v, depth - 1)}`)
       .join(', ');
     return `{${content}}`;
